@@ -8,7 +8,7 @@ A governance-first, multi-agent invoice processing system built with CrewAI and 
 
 ![Pipeline Architecture](docs/architecture.svg)
 
-The system follows a left-to-right pipeline: raw documents enter through the API, pass through five sequential agents, and emerge as structured reconciliation reports. The governance engine runs between every agent stage -- not as a post-processing step -- ensuring high-risk invoices are caught early.
+The system follows a left-to-right pipeline: raw documents enter through the API, pass through five sequential agents, and emerge as structured reconciliation reports. The governance engine runs between every agent stage, not as a post-processing step, ensuring high-risk invoices are caught early.
 
 ---
 
