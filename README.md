@@ -1,6 +1,6 @@
 # Agentic Invoice Intelligence
 
-A governance-first, multi-agent invoice processing system built with CrewAI and FastAPI. Five specialised AI agents collaborate to extract, validate, detect anomalies, and reconcile invoices -- with a governance engine that enforces business rules inline at every pipeline stage.
+A governance-first, multi-agent invoice processing system built with CrewAI and FastAPI. Five specialised AI agents collaborate to extract, validate, detect anomalies, and reconcile invoices  with a governance engine that enforces business rules inline at every pipeline stage.
 
 ---
 
