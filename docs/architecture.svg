@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100%" viewBox="0 0 1200 850" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    <linearGradient id="agent1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#2563eb"/>
+    </linearGradient>
+    <linearGradient id="agent2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#d97706"/>
+    </linearGradient>
+    <linearGradient id="agent3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="agent4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#059669"/>
+    </linearGradient>
+    <linearGradient id="agent5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4"/>
+      <stop offset="100%" style="stop-color:#0891b2"/>
+    </linearGradient>
+    <linearGradient id="govGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f43f5e"/>
+      <stop offset="100%" style="stop-color:#e11d48"/>
+    </linearGradient>
+    <linearGradient id="hitlGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a855f7"/>
+      <stop offset="100%" style="stop-color:#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="toolGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#334155"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <marker id="arrowGov" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f43f5e"/>
+    </marker>
+    <marker id="arrowHitl" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#a855f7"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="850" fill="url(#bg)"/>
+
+  <!-- Title -->
+  <text x="600" y="40" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">AgenticInvoiceIntelligence</text>
+  <text x="600" y="62" text-anchor="middle" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="13">Governance-First Document Processing | Confidence Scoring | Human-in-the-Loop | Full Audit Trail</text>
+
+  <!-- ============================================================ -->
+  <!-- INPUT -->
+  <!-- ============================================================ -->
+  <g transform="translate(40, 105)">
+    <rect width="130" height="90" rx="12" fill="url(#toolGrad)" filter="url(#shadow)" stroke="#475569" stroke-width="1"/>
+    <text x="65" y="30" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600">Invoice PDF</text>
+    <text x="65" y="48" text-anchor="middle" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="10">Digital / Scanned</text>
+    <text x="65" y="63" text-anchor="middle" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="10">FastAPI Upload</text>
+    <text x="65" y="78" text-anchor="middle" fill="#64748b" font-family="Inter, Arial, sans-serif" font-size="9">scan001.pdf</text>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- AGENT ROW 1 (Above Governance): Agents 1, 2 -->
+  <!-- ============================================================ -->
+
+  <!-- Agent 1: Document Intake -->
+  <g transform="translate(210, 90)">
+    <rect width="185" height="115" rx="12" fill="url(#agent1)" filter="url(#shadow)"/>
+    <circle cx="93" cy="25" r="13" fill="rgba(255,255,255,0.2)"/>
+    <text x="93" y="30" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">1</text>
+    <text x="93" y="52" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600">Document Intake</text>
+    <text x="93" y="68" text-anchor="middle" fill="#bfdbfe" font-family="Inter, Arial, sans-serif" font-size="10">PDF Parsing / OCR</text>
+    <text x="93" y="82" text-anchor="middle" fill="#bfdbfe" font-family="Inter, Arial, sans-serif" font-size="10">Document Classification</text>
+    <text x="93" y="96" text-anchor="middle" fill="#93c5fd" font-family="Inter, Arial, sans-serif" font-size="9" font-style="italic">pdfplumber + pytesseract</text>
+    <text x="93" y="108" text-anchor="middle" fill="#93c5fd" font-family="Inter, Arial, sans-serif" font-size="9" font-style="italic">OCR confidence score</text>
+  </g>
+
+  <!-- Agent 2: Data Extraction -->
+  <g transform="translate(440, 90)">
+    <rect width="185" height="115" rx="12" fill="url(#agent2)" filter="url(#shadow)"/>
+    <circle cx="93" cy="25" r="13" fill="rgba(255,255,255,0.2)"/>
+    <text x="93" y="30" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">2</text>
+    <text x="93" y="52" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600">Data Extraction</text>
+    <text x="93" y="68" text-anchor="middle" fill="#fef3c7" font-family="Inter, Arial, sans-serif" font-size="10">LLM Schema Mapping</text>
+    <text x="93" y="82" text-anchor="middle" fill="#fef3c7" font-family="Inter, Arial, sans-serif" font-size="10">Pydantic Validation</text>
+    <text x="93" y="96" text-anchor="middle" fill="#fde68a" font-family="Inter, Arial, sans-serif" font-size="9" font-style="italic">Vendor, Amount, Line Items</text>
+    <text x="93" y="108" text-anchor="middle" fill="#fde68a" font-family="Inter, Arial, sans-serif" font-size="9" font-style="italic">Extraction → Gov Engine</text>
+  </g>
+
+  <!-- Arrows: Input → Agent 1 → Agent 2 -->
+  <path d="M 170 150 L 200 150" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+  <path d="M 395 147 L 430 147" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+
+  <!-- ============================================================ -->
+  <!-- GOVERNANCE ENGINE — Horizontal bar -->
+  <!-- ============================================================ -->
+  <g transform="translate(40, 310)">
+    <rect width="780" height="100" rx="14" fill="url(#govGrad)" filter="url(#shadow)" stroke="#f43f5e" stroke-width="2" opacity="0.95"/>
+    <text x="390" y="25" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700">GOVERNANCE ENGINE — Inline Policy Enforcement</text>
+    <line x1="20" y1="36" x2="760" y2="36" stroke="#fecdd3" stroke-width="0.5" opacity="0.3"/>
+
+    <g transform="translate(15, 46)">
+      <rect width="175" height="38" rx="8" fill="rgba(255,255,255,0.12)"/>
+      <text x="88" y="16" text-anchor="middle" fill="#fecdd3" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="600">OCR Confidence Gate</text>
+      <text x="88" y="30" text-anchor="middle" fill="#fecdd3" font-family="Inter, Arial, sans-serif" font-size="9">Score &lt; 85% → Human Verify</text>
+    </g>
+    <g transform="translate(205, 46)">
+      <rect width="175" height="38" rx="8" fill="rgba(255,255,255,0.12)"/>
+      <text x="88" y="16" text-anchor="middle" fill="#fecdd3" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="600">Materiality Gates</text>
+      <text x="88" y="30" text-anchor="middle" fill="#fecdd3" font-family="Inter, Arial, sans-serif" font-size="9">$5K (L1) | $25K (L2) | $100K (L3)</text>
+    </g>
+    <g transform="translate(395, 46)">
+      <rect width="175" height="38" rx="8" fill="rgba(255,255,255,0.12)"/>
+      <text x="88" y="16" text-anchor="middle" fill="#fecdd3" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="600">Variance Threshold</text>
+      <text x="88" y="30" text-anchor="middle" fill="#fecdd3" font-family="Inter, Arial, sans-serif" font-size="9">PO diff &gt; 10% → Investigate</text>
+    </g>
+    <g transform="translate(585, 46)">
+      <rect width="175" height="38" rx="8" fill="rgba(255,255,255,0.12)"/>
+      <text x="88" y="16" text-anchor="middle" fill="#fecdd3" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="600">Immutable Audit Trail</text>
+      <text x="88" y="30" text-anchor="middle" fill="#fecdd3" font-family="Inter, Arial, sans-serif" font-size="9">Every decision logged</text>
+    </g>
+  </g>
+
+  <!-- Arrows DOWN from Agents 1, 2 into Governance -->
+  <path d="M 303 205 L 303 300" stroke="#f43f5e" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrowGov)" fill="none"/>
+  <path d="M 533 205 L 533 300" stroke="#f43f5e" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrowGov)" fill="none"/>
+  <text x="313" y="260" fill="#f43f5e" font-family="Inter, Arial, sans-serif" font-size="9" font-weight="600">OCR check</text>
+  <text x="543" y="260" fill="#f43f5e" font-family="Inter, Arial, sans-serif" font-size="9" font-weight="600">confidence check</text>
+
+  <!-- ============================================================ -->
+  <!-- HITL Box (right side) -->
+  <!-- ============================================================ -->
+  <g transform="translate(860, 90)">
+    <rect width="300" height="190" rx="14" fill="url(#hitlGrad)" filter="url(#shadow)" stroke="#a855f7" stroke-width="1.5"/>
+    <text x="150" y="25" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">Human-in-the-Loop</text>
+    <line x1="15" y1="36" x2="285" y2="36" stroke="#e9d5ff" stroke-width="0.5" opacity="0.3"/>
+    <text x="20" y="56" fill="#e9d5ff" font-family="Inter, Arial, sans-serif" font-size="10">OCR confidence &lt; 85% → Verify extraction</text>
+    <text x="20" y="73" fill="#e9d5ff" font-family="Inter, Arial, sans-serif" font-size="10">Invoice &gt; $5K → Manager review</text>
+    <text x="20" y="90" fill="#e9d5ff" font-family="Inter, Arial, sans-serif" font-size="10">Invoice &gt; $25K → Controller review</text>
+    <text x="20" y="107" fill="#e9d5ff" font-family="Inter, Arial, sans-serif" font-size="10">Invoice &gt; $100K → VP/CFO review</text>
+    <text x="20" y="124" fill="#e9d5ff" font-family="Inter, Arial, sans-serif" font-size="10">PO variance &gt; 10% → Investigation</text>
+    <text x="20" y="141" fill="#e9d5ff" font-family="Inter, Arial, sans-serif" font-size="10">Unknown vendor → Vendor verification</text>
+    <text x="20" y="158" fill="#e9d5ff" font-family="Inter, Arial, sans-serif" font-size="10">Duplicate detected → Block and escalate</text>
+    <line x1="15" y1="168" x2="285" y2="168" stroke="#e9d5ff" stroke-width="0.5" opacity="0.3"/>
+    <rect x="15" y="173" width="270" height="12" rx="4" fill="rgba(255,255,255,0.1)"/>
+    <text x="150" y="183" text-anchor="middle" fill="#e9d5ff" font-family="Inter, Arial, sans-serif" font-size="8" font-weight="600">Approve / Reject via API (/invoices/{id}/approve)</text>
+  </g>
+
+  <!-- Arrow from Governance to HITL -->
+  <path d="M 820 360 L 950 360 L 950 290" stroke="#a855f7" stroke-width="2" marker-end="url(#arrowHitl)" fill="none"/>
+  <text x="870" y="355" fill="#a855f7" font-family="Inter, Arial, sans-serif" font-size="9" font-weight="600">escalate</text>
+
+  <!-- ============================================================ -->
+  <!-- AGENT ROW 2 (Below Governance): Agents 3, 4, 5 -->
+  <!-- ============================================================ -->
+
+  <!-- Agent 3: Validation -->
+  <g transform="translate(40, 460)">
+    <rect width="210" height="110" rx="12" fill="url(#agent3)" filter="url(#shadow)"/>
+    <circle cx="105" cy="25" r="13" fill="rgba(255,255,255,0.2)"/>
+    <text x="105" y="30" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">3</text>
+    <text x="105" y="52" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600">Validation</text>
+    <text x="105" y="68" text-anchor="middle" fill="#e9d5ff" font-family="Inter, Arial, sans-serif" font-size="10">PO Cross-Reference</text>
+    <text x="105" y="82" text-anchor="middle" fill="#e9d5ff" font-family="Inter, Arial, sans-serif" font-size="10">Vendor Registry Check</text>
+    <text x="105" y="96" text-anchor="middle" fill="#d8b4fe" font-family="Inter, Arial, sans-serif" font-size="9" font-style="italic">Mismatches → Gov Engine</text>
+  </g>
+
+  <!-- Agent 4: Anomaly Detection -->
+  <g transform="translate(290, 460)">
+    <rect width="210" height="110" rx="12" fill="url(#agent4)" filter="url(#shadow)"/>
+    <circle cx="105" cy="25" r="13" fill="rgba(255,255,255,0.2)"/>
+    <text x="105" y="30" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">4</text>
+    <text x="105" y="52" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600">Anomaly Detection</text>
+    <text x="105" y="68" text-anchor="middle" fill="#a7f3d0" font-family="Inter, Arial, sans-serif" font-size="10">Duplicate Invoices</text>
+    <text x="105" y="82" text-anchor="middle" fill="#a7f3d0" font-family="Inter, Arial, sans-serif" font-size="10">Amount Outliers</text>
+    <text x="105" y="96" text-anchor="middle" fill="#6ee7b7" font-family="Inter, Arial, sans-serif" font-size="9" font-style="italic">Fraud signals → Gov Engine</text>
+  </g>
+
+  <!-- Agent 5: Reconciliation -->
+  <g transform="translate(540, 460)">
+    <rect width="210" height="110" rx="12" fill="url(#agent5)" filter="url(#shadow)"/>
+    <circle cx="105" cy="25" r="13" fill="rgba(255,255,255,0.2)"/>
+    <text x="105" y="30" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">5</text>
+    <text x="105" y="52" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600">Reconciliation</text>
+    <text x="105" y="68" text-anchor="middle" fill="#a5f3fc" font-family="Inter, Arial, sans-serif" font-size="10">Exception Report</text>
+    <text x="105" y="82" text-anchor="middle" fill="#a5f3fc" font-family="Inter, Arial, sans-serif" font-size="10">Audit Summary</text>
+    <text x="105" y="96" text-anchor="middle" fill="#67e8f9" font-family="Inter, Arial, sans-serif" font-size="9" font-style="italic">Final reconciliation package</text>
+  </g>
+
+  <!-- Arrows: Gov → Agent 3 → Agent 4 → Agent 5 -->
+  <path d="M 145 410 L 145 450" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+  <path d="M 250 515 L 280 515" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+  <path d="M 500 515 L 530 515" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+
+  <!-- Arrows UP from Agents 3, 4 to Governance -->
+  <path d="M 200 460 L 200 420" stroke="#f43f5e" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrowGov)" fill="none"/>
+  <path d="M 445 460 L 445 420" stroke="#f43f5e" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrowGov)" fill="none"/>
+  <text x="210" y="443" fill="#f43f5e" font-family="Inter, Arial, sans-serif" font-size="9" font-weight="600">variance check</text>
+  <text x="455" y="443" fill="#f43f5e" font-family="Inter, Arial, sans-serif" font-size="9" font-weight="600">anomaly flag</text>
+
+  <!-- ============================================================ -->
+  <!-- OUTPUT -->
+  <!-- ============================================================ -->
+  <g transform="translate(800, 460)">
+    <rect width="360" height="110" rx="12" fill="url(#toolGrad)" filter="url(#shadow)" stroke="#475569" stroke-width="1"/>
+    <text x="180" y="25" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="600">Output</text>
+    <line x1="15" y1="36" x2="345" y2="36" stroke="#475569" stroke-width="0.5"/>
+    <rect x="15" y="44" width="100" height="24" rx="8" fill="#059669" opacity="0.8"/>
+    <text x="65" y="61" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="600">Reconciled</text>
+    <rect x="130" y="44" width="100" height="24" rx="8" fill="#f59e0b" opacity="0.8"/>
+    <text x="180" y="61" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="600">Flagged</text>
+    <rect x="245" y="44" width="100" height="24" rx="8" fill="#ef4444" opacity="0.8"/>
+    <text x="295" y="61" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="600">Exception</text>
+    <rect x="15" y="78" width="330" height="22" rx="8" fill="rgba(6,182,212,0.3)" stroke="#06b6d4" stroke-width="1"/>
+    <text x="180" y="94" text-anchor="middle" fill="#a5f3fc" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="600">Reconciliation Report + Full Audit Trail</text>
+  </g>
+
+  <!-- Arrow: Agent 5 → Output -->
+  <path d="M 750 515 L 790 515" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+
+  <!-- ============================================================ -->
+  <!-- TOOLS + DATA LAYER -->
+  <!-- ============================================================ -->
+  <g transform="translate(40, 620)">
+    <rect width="380" height="110" rx="12" fill="url(#toolGrad)" filter="url(#shadow)" stroke="#475569" stroke-width="1"/>
+    <text x="190" y="25" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="600">Agent Tools</text>
+    <line x1="15" y1="36" x2="365" y2="36" stroke="#475569" stroke-width="0.5"/>
+    <text x="15" y="55" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="600">Document Processing</text>
+    <text x="15" y="70" fill="#64748b" font-family="Inter, Arial, sans-serif" font-size="9">pdfplumber | pytesseract OCR | File Classifier</text>
+    <text x="15" y="87" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="600">Validation and Anomaly</text>
+    <text x="15" y="102" fill="#64748b" font-family="Inter, Arial, sans-serif" font-size="9">PO Lookup | Vendor Registry | Budget Check | Duplicate Detector</text>
+  </g>
+
+  <g transform="translate(440, 620)">
+    <rect width="280" height="110" rx="12" fill="url(#toolGrad)" filter="url(#shadow)" stroke="#475569" stroke-width="1"/>
+    <text x="140" y="25" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="600">Data Layer</text>
+    <line x1="15" y1="36" x2="265" y2="36" stroke="#475569" stroke-width="0.5"/>
+    <text x="15" y="55" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="600">SQLite (Simulated ERP)</text>
+    <text x="15" y="70" fill="#64748b" font-family="Inter, Arial, sans-serif" font-size="9">20 Vendors | 15 POs | Invoice Records</text>
+    <text x="15" y="87" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="600">ChromaDB (Vector Store)</text>
+    <text x="15" y="102" fill="#64748b" font-family="Inter, Arial, sans-serif" font-size="9">Vendor Policies | Invoice Guidelines</text>
+  </g>
+
+  <g transform="translate(740, 620)">
+    <rect width="420" height="110" rx="12" fill="url(#toolGrad)" filter="url(#shadow)" stroke="#475569" stroke-width="1"/>
+    <text x="210" y="25" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="600">API Layer</text>
+    <line x1="15" y1="36" x2="405" y2="36" stroke="#475569" stroke-width="0.5"/>
+    <text x="15" y="55" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="600">FastAPI (13+ Endpoints)</text>
+    <text x="15" y="70" fill="#64748b" font-family="Inter, Arial, sans-serif" font-size="9">/invoices/upload | /invoices/{id} | /invoices/{id}/approve</text>
+    <text x="15" y="85" fill="#64748b" font-family="Inter, Arial, sans-serif" font-size="9">/reconciliation/report | /reconciliation/exceptions</text>
+    <text x="15" y="100" fill="#64748b" font-family="Inter, Arial, sans-serif" font-size="9">/governance/dashboard | /governance/audit-trail | /vendors | /purchase-orders</text>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- TECH BADGES -->
+  <!-- ============================================================ -->
+  <g transform="translate(40, 760)">
+    <rect width="95" height="28" rx="14" fill="#334155" stroke="#475569" stroke-width="1"/>
+    <text x="48" y="19" text-anchor="middle" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="11">CrewAI</text>
+  </g>
+  <g transform="translate(150, 760)">
+    <rect width="95" height="28" rx="14" fill="#334155" stroke="#475569" stroke-width="1"/>
+    <text x="48" y="19" text-anchor="middle" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="11">pdfplumber</text>
+  </g>
+  <g transform="translate(260, 760)">
+    <rect width="95" height="28" rx="14" fill="#334155" stroke="#475569" stroke-width="1"/>
+    <text x="48" y="19" text-anchor="middle" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="11">LangChain</text>
+  </g>
+  <g transform="translate(370, 760)">
+    <rect width="95" height="28" rx="14" fill="#334155" stroke="#475569" stroke-width="1"/>
+    <text x="48" y="19" text-anchor="middle" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="11">FastAPI</text>
+  </g>
+  <g transform="translate(480, 760)">
+    <rect width="95" height="28" rx="14" fill="#334155" stroke="#475569" stroke-width="1"/>
+    <text x="48" y="19" text-anchor="middle" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="11">ChromaDB</text>
+  </g>
+  <g transform="translate(590, 760)">
+    <rect width="95" height="28" rx="14" fill="#334155" stroke="#475569" stroke-width="1"/>
+    <text x="48" y="19" text-anchor="middle" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="11">Pydantic</text>
+  </g>
+  <g transform="translate(700, 760)">
+    <rect width="95" height="28" rx="14" fill="#334155" stroke="#475569" stroke-width="1"/>
+    <text x="48" y="19" text-anchor="middle" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="11">Docker</text>
+  </g>
+  <g transform="translate(810, 760)">
+    <rect width="95" height="28" rx="14" fill="#334155" stroke="#475569" stroke-width="1"/>
+    <text x="48" y="19" text-anchor="middle" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="11">OpenAI</text>
+  </g>
+  <g transform="translate(920, 760)">
+    <rect width="95" height="28" rx="14" fill="#334155" stroke="#475569" stroke-width="1"/>
+    <text x="48" y="19" text-anchor="middle" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="11">Tesseract</text>
+  </g>
+
+  <!-- Footer -->
+  <text x="600" y="820" text-anchor="middle" fill="#475569" font-family="Inter, Arial, sans-serif" font-size="10">Governance Engine sits between agent layers. Every extraction, validation, and anomaly passes through policy enforcement before proceeding.</text>
+</svg>

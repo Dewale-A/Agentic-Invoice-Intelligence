@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: invoice_intelligence_api
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o}
+      - APP_ENV=${APP_ENV:-production}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - OCR_CONFIDENCE_THRESHOLD=${OCR_CONFIDENCE_THRESHOLD:-0.85}
+      - AGENT_CONFIDENCE_THRESHOLD=${AGENT_CONFIDENCE_THRESHOLD:-0.70}
+      - VARIANCE_THRESHOLD_PCT=${VARIANCE_THRESHOLD_PCT:-0.10}
+      - MATERIALITY_L1=${MATERIALITY_L1:-5000}
+      - MATERIALITY_L2=${MATERIALITY_L2:-25000}
+      - MATERIALITY_L3=${MATERIALITY_L3:-100000}
+    volumes:
+      - invoice_data:/app/src/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  invoice_data:
+    driver: local
