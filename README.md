@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/Dewale-A/AgenticInvoiceIntelligence/actions/workflows/ci.yml/badge.svg)
 
-A governance-first, multi-agent invoice processing system built with CrewAI and FastAPI. Five specialised AI agents collaborate to extract, validate, detect anomalies, and reconcile invoices -- with a governance engine that enforces business rules inline at every pipeline stage.
+A governance-first, multi-agent invoice processing system built with CrewAI and FastAPI. Five specialised AI agents collaborate to extract, validate, detect anomalies, and reconcile invoices  with a governance engine that enforces business rules inline at every pipeline stage.
 
 ---
 
@@ -10,7 +10,7 @@ A governance-first, multi-agent invoice processing system built with CrewAI and 
 
 ![Pipeline Architecture](docs/architecture.svg)
 
-The system follows a left-to-right pipeline: raw documents enter through the API, pass through five sequential agents, and emerge as structured reconciliation reports. The governance engine runs between every agent stage -- not as a post-processing step -- ensuring high-risk invoices are caught early.
+The system follows a left-to-right pipeline: raw documents enter through the API, pass through five sequential agents, and emerge as structured reconciliation reports. The governance engine runs between every agent stage, not as a post-processing step, ensuring high-risk invoices are caught early.
 
 ---
 
