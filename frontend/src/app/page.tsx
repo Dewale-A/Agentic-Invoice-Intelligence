@@ -344,7 +344,7 @@ export default function Home() {
                   <p className="text-xs text-gray-400">Supports PDF invoices</p>
                 </div>
               )}
-              <input type="file" accept=".pdf" onChange={handleUpload} className="hidden" disabled={uploading} />
+              <input type="file" accept=".pdf,application/pdf" onChange={handleUpload} className="hidden" disabled={uploading} />
             </label>
 
             {uploadStatus && (
