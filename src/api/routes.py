@@ -357,6 +357,175 @@ def get_governance_audit_trail(
 
 
 # ---------------------------------------------------------------------------
+# Human Review (Governance Loop Closure)
+# ---------------------------------------------------------------------------
+
+
+@router.get("/reviews/pending", tags=["Human Review"])
+def get_pending_reviews_endpoint() -> dict[str, Any]:
+    """Get invoices awaiting human review."""
+    from src.data.database import get_pending_reviews
+    pending = get_pending_reviews()
+    return {"total": len(pending), "pending_reviews": pending}
+
+
+@router.post("/reviews/{invoice_id}/decide", tags=["Human Review"])
+def submit_human_decision(
+    invoice_id: str,
+    reviewer_id: str = Query(..., description="Reviewer identifier"),
+    reviewer_name: str = Query(..., description="Reviewer display name"),
+    decision: str = Query(..., description="approve | adjust_and_approve | reject | escalate_further"),
+    rationale_category: str = Query(..., description="Rationale category"),
+    rationale_text: str = Query("", description="One-line rationale explanation"),
+) -> dict[str, Any]:
+    """Submit a structured human review decision for an escalated invoice.
+
+    Decisions: approve, adjust_and_approve, reject, escalate_further.
+
+    Rationale categories: amount_within_variance, vendor_confirmed_correction,
+    po_mismatch_resolved, duplicate_confirmed_void, anomaly_is_legitimate,
+    requires_senior_review, policy_exception_granted, other.
+    """
+    from src.data.database import (
+        VALID_DECISIONS,
+        VALID_RATIONALE_CATEGORIES,
+        save_human_decision,
+        calculate_consistency_score,
+        get_invoice,
+        update_invoice_status,
+    )
+    from uuid import uuid4
+
+    # Validate invoice exists
+    invoice = get_invoice(invoice_id)
+    if not invoice:
+        raise _invoice_not_found(invoice_id)
+
+    # Validate decision
+    if decision not in VALID_DECISIONS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid decision. Must be one of: {', '.join(sorted(VALID_DECISIONS))}",
+        )
+
+    # Validate rationale category
+    if rationale_category not in VALID_RATIONALE_CATEGORIES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid rationale category. Must be one of: {', '.join(sorted(VALID_RATIONALE_CATEGORIES))}",
+        )
+
+    # Get the original flag that triggered escalation
+    from src.data.database import db_session, DB_PATH
+    with db_session(DB_PATH) as conn:
+        gov_row = conn.execute(
+            """SELECT rule_triggered, actor FROM governance_decisions
+               WHERE invoice_id = ? AND escalation_level != 'none'
+               ORDER BY timestamp DESC LIMIT 1""",
+            (invoice_id,),
+        ).fetchone()
+
+    original_flag = gov_row["rule_triggered"] if gov_row else "unknown"
+    original_agent = gov_row["actor"] if gov_row else "unknown"
+
+    # Calculate consistency score
+    consistency = calculate_consistency_score(original_flag, decision)
+
+    # Save the decision
+    decision_record = {
+        "decision_id": str(uuid4()),
+        "invoice_id": invoice_id,
+        "reviewer_id": reviewer_id,
+        "reviewer_name": reviewer_name,
+        "decision": decision,
+        "rationale_category": rationale_category,
+        "rationale_text": rationale_text,
+        "original_flag": original_flag,
+        "original_agent": original_agent,
+        "consistency_score": consistency,
+        "resolution_time_hours": 0.0,
+        "timestamp": datetime.utcnow().isoformat(),
+    }
+    save_human_decision(decision_record)
+
+    # Update invoice status based on decision
+    status_map = {
+        "approve": "approved",
+        "adjust_and_approve": "approved",
+        "reject": "rejected",
+        "escalate_further": "on_hold",
+    }
+    update_invoice_status(invoice_id, status_map[decision])
+
+    return {
+        "status": "recorded",
+        "decision_id": decision_record["decision_id"],
+        "invoice_id": invoice_id,
+        "decision": decision,
+        "consistency_score": consistency,
+        "consistency_note": "Not enough historical data" if consistency < 0 else (
+            "Aligned with historical pattern" if consistency > 0.6 else
+            "Deviates from historical pattern - flagged for review"
+        ),
+    }
+
+
+@router.get("/reviews/history", tags=["Human Review"])
+def get_review_history(
+    invoice_id: Optional[str] = Query(None),
+    reviewer_id: Optional[str] = Query(None),
+    limit: int = Query(50, ge=1, le=500),
+) -> dict[str, Any]:
+    """Get human review decision history with optional filters."""
+    from src.data.database import get_human_decisions
+    decisions = get_human_decisions(invoice_id=invoice_id, reviewer_id=reviewer_id, limit=limit)
+    return {"total": len(decisions), "decisions": decisions}
+
+
+@router.get("/reviews/consistency", tags=["Human Review"])
+def get_consistency_dashboard() -> dict[str, Any]:
+    """Get decision pattern analysis and reviewer consistency metrics."""
+    from src.data.database import get_decision_patterns, get_human_decisions
+    patterns = get_decision_patterns()
+    recent = get_human_decisions(limit=100)
+
+    # Get unique reviewers and their consistency
+    reviewer_ids = set(d["reviewer_id"] for d in recent)
+    reviewer_stats = []
+    for rid in reviewer_ids:
+        from src.data.database import get_reviewer_consistency
+        stats = get_reviewer_consistency(rid)
+        reviewer_stats.append(stats)
+
+    return {
+        "decision_patterns": patterns,
+        "reviewer_stats": reviewer_stats,
+        "total_human_decisions": len(recent),
+    }
+
+
+@router.get("/governance/audit-trail/{invoice_id}", tags=["Human Review"])
+def get_full_invoice_audit_trail(invoice_id: str) -> dict[str, Any]:
+    """Get complete audit trail for an invoice: agent decisions + human decisions."""
+    from src.data.database import get_audit_trail, get_human_decisions
+
+    invoice = get_invoice(invoice_id)
+    if not invoice:
+        raise _invoice_not_found(invoice_id)
+
+    audit_entries = get_audit_trail(invoice_id)
+    human_decisions = get_human_decisions(invoice_id=invoice_id)
+
+    return {
+        "invoice_id": invoice_id,
+        "audit_entries": audit_entries,
+        "human_decisions": human_decisions,
+        "total_events": len(audit_entries),
+        "human_reviews": len(human_decisions),
+    }
+
+
+# ---------------------------------------------------------------------------
 # Reference data
 # ---------------------------------------------------------------------------
 

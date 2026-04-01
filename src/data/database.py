@@ -146,11 +146,41 @@ CREATE TABLE IF NOT EXISTS agent_decisions (
     timestamp            TEXT DEFAULT (datetime('now'))
 );
 
+CREATE TABLE IF NOT EXISTS human_decisions (
+    decision_id      TEXT PRIMARY KEY,
+    invoice_id       TEXT NOT NULL,
+    reviewer_id      TEXT NOT NULL,
+    reviewer_name    TEXT NOT NULL,
+    decision         TEXT NOT NULL,
+    rationale_category TEXT NOT NULL,
+    rationale_text   TEXT DEFAULT '',
+    original_flag    TEXT NOT NULL,
+    original_agent   TEXT DEFAULT '',
+    consistency_score REAL DEFAULT -1.0,
+    resolution_time_hours REAL DEFAULT 0.0,
+    timestamp        TEXT DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS decision_patterns (
+    pattern_id       TEXT PRIMARY KEY,
+    flag_type        TEXT NOT NULL,
+    total_decisions  INTEGER DEFAULT 0,
+    approve_count    INTEGER DEFAULT 0,
+    reject_count     INTEGER DEFAULT 0,
+    adjust_count     INTEGER DEFAULT 0,
+    escalate_count   INTEGER DEFAULT 0,
+    avg_resolution_hours REAL DEFAULT 0.0,
+    last_updated     TEXT DEFAULT (datetime('now'))
+);
+
 CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(status);
 CREATE INDEX IF NOT EXISTS idx_invoices_vendor ON invoices(vendor_id);
 CREATE INDEX IF NOT EXISTS idx_audit_invoice ON audit_log(invoice_id);
 CREATE INDEX IF NOT EXISTS idx_gov_invoice ON governance_decisions(invoice_id);
 CREATE INDEX IF NOT EXISTS idx_agent_invoice ON agent_decisions(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_human_invoice ON human_decisions(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_human_reviewer ON human_decisions(reviewer_id);
+CREATE INDEX IF NOT EXISTS idx_patterns_flag ON decision_patterns(flag_type);
 """
 
 
@@ -490,6 +520,209 @@ def get_governance_stats(db_path: Path = DB_PATH) -> dict[str, Any]:
             "unknown_vendor_flags": unknown_v,
             "amount_variance_flags": variance,
         }
+
+
+# ---------------------------------------------------------------------------
+# Human decision governance
+# ---------------------------------------------------------------------------
+
+VALID_DECISIONS = {"approve", "adjust_and_approve", "reject", "escalate_further"}
+VALID_RATIONALE_CATEGORIES = {
+    "amount_within_variance",
+    "vendor_confirmed_correction",
+    "po_mismatch_resolved",
+    "duplicate_confirmed_void",
+    "anomaly_is_legitimate",
+    "requires_senior_review",
+    "policy_exception_granted",
+    "other",
+}
+
+
+def save_human_decision(decision: dict[str, Any], db_path: Path = DB_PATH) -> None:
+    """Save a structured human reviewer decision."""
+    with db_session(db_path) as conn:
+        conn.execute(
+            """INSERT INTO human_decisions
+               (decision_id, invoice_id, reviewer_id, reviewer_name, decision,
+                rationale_category, rationale_text, original_flag, original_agent,
+                consistency_score, resolution_time_hours, timestamp)
+               VALUES
+               (:decision_id, :invoice_id, :reviewer_id, :reviewer_name, :decision,
+                :rationale_category, :rationale_text, :original_flag, :original_agent,
+                :consistency_score, :resolution_time_hours, :timestamp)""",
+            decision,
+        )
+        # Update decision patterns
+        _update_decision_pattern(conn, decision["original_flag"], decision["decision"], decision.get("resolution_time_hours", 0))
+        # Append to audit trail
+        conn.execute(
+            """INSERT INTO audit_log
+               (entry_id, invoice_id, event_type, actor, description,
+                before_state, after_state, metadata, timestamp)
+               VALUES (?, ?, 'human_review', ?, ?, ?, ?, ?, ?)""",
+            (
+                str(uuid4()),
+                decision["invoice_id"],
+                f"human:{decision['reviewer_id']}",
+                f"Human reviewer {decision['reviewer_name']} decided: {decision['decision']}",
+                "escalated",
+                decision["decision"],
+                json.dumps({
+                    "rationale_category": decision["rationale_category"],
+                    "rationale_text": decision.get("rationale_text", ""),
+                    "consistency_score": decision.get("consistency_score", -1),
+                }),
+                decision.get("timestamp", datetime.utcnow().isoformat()),
+            ),
+        )
+
+
+def _update_decision_pattern(
+    conn: sqlite3.Connection, flag_type: str, decision: str, resolution_hours: float
+) -> None:
+    """Update aggregate decision patterns for consistency scoring."""
+    existing = conn.execute(
+        "SELECT * FROM decision_patterns WHERE flag_type = ?", (flag_type,)
+    ).fetchone()
+
+    if existing:
+        total = existing["total_decisions"] + 1
+        approve = existing["approve_count"] + (1 if decision == "approve" else 0)
+        reject = existing["reject_count"] + (1 if decision == "reject" else 0)
+        adjust = existing["adjust_count"] + (1 if decision == "adjust_and_approve" else 0)
+        escalate = existing["escalate_count"] + (1 if decision == "escalate_further" else 0)
+        avg_hours = (
+            (existing["avg_resolution_hours"] * existing["total_decisions"] + resolution_hours) / total
+        )
+        conn.execute(
+            """UPDATE decision_patterns
+               SET total_decisions = ?, approve_count = ?, reject_count = ?,
+                   adjust_count = ?, escalate_count = ?, avg_resolution_hours = ?,
+                   last_updated = ?
+               WHERE flag_type = ?""",
+            (total, approve, reject, adjust, escalate, round(avg_hours, 2),
+             datetime.utcnow().isoformat(), flag_type),
+        )
+    else:
+        conn.execute(
+            """INSERT INTO decision_patterns
+               (pattern_id, flag_type, total_decisions, approve_count, reject_count,
+                adjust_count, escalate_count, avg_resolution_hours, last_updated)
+               VALUES (?, ?, 1, ?, ?, ?, ?, ?, ?)""",
+            (
+                str(uuid4()), flag_type,
+                1 if decision == "approve" else 0,
+                1 if decision == "reject" else 0,
+                1 if decision == "adjust_and_approve" else 0,
+                1 if decision == "escalate_further" else 0,
+                resolution_hours,
+                datetime.utcnow().isoformat(),
+            ),
+        )
+
+
+def calculate_consistency_score(flag_type: str, decision: str, db_path: Path = DB_PATH) -> float:
+    """Calculate how consistent a decision is with historical patterns.
+    Returns a score between 0.0 (completely inconsistent) and 1.0 (fully aligned)."""
+    with db_session(db_path) as conn:
+        pattern = conn.execute(
+            "SELECT * FROM decision_patterns WHERE flag_type = ?", (flag_type,)
+        ).fetchone()
+
+        if not pattern or pattern["total_decisions"] < 3:
+            return -1.0  # Not enough data to score
+
+        total = pattern["total_decisions"]
+        if decision == "approve":
+            return round(pattern["approve_count"] / total, 3)
+        elif decision == "reject":
+            return round(pattern["reject_count"] / total, 3)
+        elif decision == "adjust_and_approve":
+            return round(pattern["adjust_count"] / total, 3)
+        elif decision == "escalate_further":
+            return round(pattern["escalate_count"] / total, 3)
+        return 0.0
+
+
+def get_human_decisions(
+    invoice_id: Optional[str] = None,
+    reviewer_id: Optional[str] = None,
+    limit: int = 50,
+    db_path: Path = DB_PATH,
+) -> list[dict[str, Any]]:
+    """Retrieve human decisions with optional filters."""
+    with db_session(db_path) as conn:
+        if invoice_id:
+            rows = conn.execute(
+                "SELECT * FROM human_decisions WHERE invoice_id = ? ORDER BY timestamp DESC",
+                (invoice_id,),
+            ).fetchall()
+        elif reviewer_id:
+            rows = conn.execute(
+                "SELECT * FROM human_decisions WHERE reviewer_id = ? ORDER BY timestamp DESC LIMIT ?",
+                (reviewer_id, limit),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM human_decisions ORDER BY timestamp DESC LIMIT ?",
+                (limit,),
+            ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def get_decision_patterns(db_path: Path = DB_PATH) -> list[dict[str, Any]]:
+    """Get all decision patterns for the consistency dashboard."""
+    with db_session(db_path) as conn:
+        rows = conn.execute(
+            "SELECT * FROM decision_patterns ORDER BY total_decisions DESC"
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def get_reviewer_consistency(reviewer_id: str, db_path: Path = DB_PATH) -> dict[str, Any]:
+    """Get consistency metrics for a specific reviewer."""
+    with db_session(db_path) as conn:
+        decisions = conn.execute(
+            "SELECT * FROM human_decisions WHERE reviewer_id = ?", (reviewer_id,)
+        ).fetchall()
+
+        if not decisions:
+            return {"reviewer_id": reviewer_id, "total_reviews": 0, "avg_consistency": -1}
+
+        scores = [d["consistency_score"] for d in decisions if d["consistency_score"] >= 0]
+        avg_score = round(sum(scores) / len(scores), 3) if scores else -1
+        avg_time = round(
+            sum(d["resolution_time_hours"] for d in decisions) / len(decisions), 2
+        )
+
+        return {
+            "reviewer_id": reviewer_id,
+            "total_reviews": len(decisions),
+            "avg_consistency": avg_score,
+            "avg_resolution_hours": avg_time,
+            "decisions_breakdown": {
+                "approve": sum(1 for d in decisions if d["decision"] == "approve"),
+                "reject": sum(1 for d in decisions if d["decision"] == "reject"),
+                "adjust": sum(1 for d in decisions if d["decision"] == "adjust_and_approve"),
+                "escalate": sum(1 for d in decisions if d["decision"] == "escalate_further"),
+            },
+        }
+
+
+def get_pending_reviews(db_path: Path = DB_PATH) -> list[dict[str, Any]]:
+    """Get invoices that are escalated and awaiting human review."""
+    with db_session(db_path) as conn:
+        rows = conn.execute(
+            """SELECT i.*, gd.rule_triggered, gd.escalation_level, gd.reason as escalation_reason
+               FROM invoices i
+               JOIN governance_decisions gd ON i.invoice_id = gd.invoice_id
+               WHERE i.status IN ('flagged', 'on_hold')
+                 AND gd.escalation_level != 'none'
+                 AND i.invoice_id NOT IN (SELECT invoice_id FROM human_decisions)
+               ORDER BY gd.timestamp ASC""",
+        ).fetchall()
+        return [dict(r) for r in rows]
 
 
 def check_duplicate_invoice(
