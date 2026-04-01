@@ -1,6 +1,7 @@
 # Agentic Invoice Intelligence
 
 ![CI](https://github.com/Dewale-A/AgenticInvoiceIntelligence/actions/workflows/ci.yml/badge.svg)
+![Deploy](https://github.com/Dewale-A/AgenticInvoiceIntelligence/actions/workflows/deploy.yml/badge.svg)
 
 A governance-first, multi-agent invoice processing system built with CrewAI and FastAPI. Five specialised AI agents collaborate to extract, validate, detect anomalies, and reconcile invoices  with a governance engine that enforces business rules inline at every pipeline stage.
 
