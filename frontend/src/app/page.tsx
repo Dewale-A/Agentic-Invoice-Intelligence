@@ -124,9 +124,10 @@ export default function Home() {
 
   const fetchAuditTrail = async (invoiceId: string) => {
     try {
-      const res = await fetch(`${PROXY}?endpoint=/governance/audit-trail/${invoiceId}`);
+      const res = await fetch(`${PROXY}?endpoint=/invoices/${invoiceId}/audit`);
       if (res.ok) {
-        setInvoiceAudit(await res.json());
+        const data = await res.json();
+        setInvoiceAudit(data);
         setSelectedInvoice(invoiceId);
       }
     } catch (e) {}
@@ -435,7 +436,7 @@ export default function Home() {
                     </button>
                   </div>
                   <div className="space-y-3">
-                    {invoiceAudit.audit_entries?.map((entry: any, i: number) => (
+                    {invoiceAudit.audit_trail?.map((entry: any, i: number) => (
                       <div key={i} className="bg-gray-50 rounded-xl p-3 text-xs">
                         <div className="flex items-center justify-between mb-1">
                           <span className="font-semibold text-gray-700">{entry.event_type}</span>
@@ -456,7 +457,7 @@ export default function Home() {
                       </div>
                     ))}
                   </div>
-                  {invoiceAudit.audit_entries?.length === 0 && invoiceAudit.human_decisions?.length === 0 && (
+                  {invoiceAudit.audit_trail?.length === 0 && invoiceAudit.human_decisions?.length === 0 && (
                     <p className="text-center text-gray-400 text-sm py-8">No audit entries yet.</p>
                   )}
                 </div>
