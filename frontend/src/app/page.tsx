@@ -114,6 +114,8 @@ export default function Home() {
   const [invoiceAudit, setInvoiceAudit] = useState<any>(null);
   const [healthOk, setHealthOk] = useState(false);
   const [vendorCount, setVendorCount] = useState(0);
+  const [vendors, setVendors] = useState<any[]>([]);
+  const [showVendors, setShowVendors] = useState(false);
 
   const [reviewForm, setReviewForm] = useState({
     reviewer_id: "", reviewer_name: "", decision: "approve",
@@ -126,6 +128,13 @@ export default function Home() {
     setLoading(true);
     await Promise.all([fetchHealth(), fetchDashboard(), fetchInvoices(), fetchPendingReviews()]);
     setLoading(false);
+  };
+
+  const fetchVendors = async () => {
+    try {
+      const res = await fetch(`${PROXY}?endpoint=/vendors`);
+      if (res.ok) { const d = await res.json(); setVendors(d.vendors || []); setShowVendors(true); }
+    } catch (e) {}
   };
 
   const fetchHealth = async () => {
@@ -295,10 +304,13 @@ export default function Home() {
 
             <div className="flex items-center gap-2">
               {healthOk && (
-                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/50 rounded-lg">
+                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                  onClick={fetchVendors}
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/50 rounded-lg hover:bg-slate-700/50 transition cursor-pointer"
+                >
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span className="text-[11px] text-slate-400">{vendorCount} vendors</span>
-                </div>
+                </motion.button>
               )}
               <motion.button whileHover={{ rotate: 180 }} transition={{ duration: 0.3 }} onClick={fetchAll} className="p-2 text-slate-400 hover:text-indigo-400 transition">
                 <RefreshCw className="w-4 h-4" />
@@ -307,6 +319,56 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {/* Vendor List Modal */}
+      <AnimatePresence>
+        {showVendors && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setShowVendors(false)}
+          >
+            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+              className="bg-white rounded-2xl p-6 max-w-2xl w-full mx-4 shadow-2xl max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+                    <Users className="w-4 h-4 text-emerald-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900">Approved Vendors</h3>
+                    <p className="text-[10px] text-gray-400">{vendors.length} registered vendors</p>
+                  </div>
+                </div>
+                <motion.button whileHover={{ scale: 1.1 }} onClick={() => setShowVendors(false)} className="p-1.5 hover:bg-gray-100 rounded-lg">
+                  <X className="w-4 h-4 text-gray-400" />
+                </motion.button>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {vendors.map((v: any, i: number) => (
+                  <motion.div key={v.vendor_id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}
+                    className="py-3 flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">{v.name}</p>
+                      <div className="flex items-center gap-2 text-[11px] text-gray-400 mt-0.5">
+                        <span>{v.vendor_id}</span>
+                        <span className="w-1 h-1 rounded-full bg-gray-300" />
+                        <span>{v.category}</span>
+                        <span className="w-1 h-1 rounded-full bg-gray-300" />
+                        <span>Net {v.payment_terms_days} days</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-gray-700">${v.contracted_rate?.toLocaleString()}</p>
+                      <p className="text-[10px] text-gray-400">contracted rate</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6">
