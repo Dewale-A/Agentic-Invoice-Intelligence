@@ -760,3 +760,15 @@ if __name__ == "__main__":
     print(f"Database bootstrapped at {DB_PATH}")
     print(f"Vendors: {len(list_vendors())}")
     print(f"Purchase orders: {len(list_purchase_orders())}")
+
+
+def get_pending_reviews(db_path: Path = DB_PATH) -> list[dict[str, Any]]:
+    """Retrieve all invoices pending human review."""
+    conn = get_connection(db_path)
+    try:
+        rows = conn.execute(
+            "SELECT * FROM invoices WHERE status = 'pending_review'"
+        ).fetchall()
+        return [dict(r) for r in rows]
+    finally:
+        conn.close()
