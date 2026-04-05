@@ -15,6 +15,7 @@ Tables:
 """
 
 from __future__ import annotations
+import os
 
 import json
 import sqlite3
@@ -25,7 +26,7 @@ from pathlib import Path
 from typing import Any, Generator, Optional
 from uuid import uuid4
 
-DB_PATH = Path(__file__).parent / "invoice_intelligence.db"
+DB_PATH = Path(os.environ.get("DB_PATH", "/app/data/invoice_intelligence.db"))
 
 # ---------------------------------------------------------------------------
 # Connection management
@@ -767,7 +768,7 @@ def get_pending_reviews(db_path: Path = DB_PATH) -> list[dict[str, Any]]:
     conn = get_connection(db_path)
     try:
         rows = conn.execute(
-            "SELECT * FROM invoices WHERE status = 'pending_review'"
+            "SELECT * FROM invoices WHERE status IN ('pending_review', 'on_hold', 'escalated')"
         ).fetchall()
         return [dict(r) for r in rows]
     finally:

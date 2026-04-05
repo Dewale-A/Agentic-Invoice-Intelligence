@@ -21,7 +21,7 @@ services:
       - MATERIALITY_L2=${MATERIALITY_L2:-25000}
       - MATERIALITY_L3=${MATERIALITY_L3:-100000}
     volumes:
-      - invoice_data:/app/src/data
+      - invoice_data:/app/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
