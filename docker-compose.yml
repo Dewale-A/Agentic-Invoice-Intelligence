@@ -20,6 +20,7 @@ services:
       - MATERIALITY_L1=${MATERIALITY_L1:-5000}
       - MATERIALITY_L2=${MATERIALITY_L2:-25000}
       - MATERIALITY_L3=${MATERIALITY_L3:-100000}
+      - DEMO_MODE=${DEMO_MODE:-true}
     volumes:
       - invoice_data:/app/data
     restart: unless-stopped

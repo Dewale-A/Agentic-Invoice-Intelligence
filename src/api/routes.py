@@ -66,6 +66,22 @@ from src.models.schemas import (
 router = APIRouter()
 
 # ---------------------------------------------------------------------------
+# Demo Mode Guard
+# ---------------------------------------------------------------------------
+
+DEMO_MODE = os.environ.get("DEMO_MODE", "false").lower() in ("true", "1", "yes")
+
+
+def _check_demo_mode():
+    """Block write operations when running in demo mode."""
+    if DEMO_MODE:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This is a live demo. Write operations are disabled for public access. Visit github.com/Dewale-A/AgenticInvoiceIntelligence for the source code.",
+        )
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
@@ -128,6 +144,7 @@ async def upload_invoice(
     The invoice is processed synchronously through the full 5-agent pipeline.
     For production use, replace with an async queue (Celery, SQS, etc.).
     """
+    _check_demo_mode()
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -218,6 +235,7 @@ def approve_invoice(invoice_id: str, request: InvoiceApprovalRequest) -> dict[st
     Only invoices in PENDING, PROCESSING, VALIDATED, FLAGGED, or ON_HOLD status
     can be approved. REJECTED invoices require a new submission.
     """
+    _check_demo_mode()
     invoice = get_invoice(invoice_id)
     if not invoice:
         raise _invoice_not_found(invoice_id)
@@ -257,6 +275,7 @@ def approve_invoice(invoice_id: str, request: InvoiceApprovalRequest) -> dict[st
 @router.post("/invoices/{invoice_id}/reject", tags=["Invoices"])
 def reject_invoice(invoice_id: str, request: InvoiceRejectionRequest) -> dict[str, Any]:
     """Manually reject an invoice."""
+    _check_demo_mode()
     invoice = get_invoice(invoice_id)
     if not invoice:
         raise _invoice_not_found(invoice_id)
@@ -386,6 +405,7 @@ def submit_human_decision(
     po_mismatch_resolved, duplicate_confirmed_void, anomaly_is_legitimate,
     requires_senior_review, policy_exception_granted, other.
     """
+    _check_demo_mode()
     from src.data.database import (
         VALID_DECISIONS,
         VALID_RATIONALE_CATEGORIES,

@@ -14,7 +14,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
-      <body className="antialiased bg-[#f8fafc] text-gray-900">{children}</body>
+      <body className="antialiased bg-[#f8fafc] text-gray-900">
+        <div className="bg-indigo-600 text-white text-center py-2 px-4 text-sm font-medium">
+          <span className="mr-2">🔒</span>
+          Live Demo: Browse freely. Write operations are disabled for public access.
+          <a href="https://github.com/Dewale-A/AgenticInvoiceIntelligence" className="underline ml-2 font-semibold" target="_blank" rel="noopener noreferrer">View Source Code</a>
+        </div>
+        {children}
+      </body>
     </html>
   );
 }
