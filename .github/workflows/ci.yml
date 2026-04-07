@@ -27,7 +27,9 @@ jobs:
       - name: Run tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DB_PATH: ./data/test_invoice_intelligence.db
         run: |
+          mkdir -p ./data
           pytest tests/ -v --tb=short
 
   docker-build:
